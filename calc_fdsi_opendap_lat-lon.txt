@@ -59,7 +59,7 @@ wks = gsn_open_wks(output, outfile)
 
 
 ;----------------
-; OPeNDAP access data 
+; OPeNDAP MACA data access 
 
 diri_p1 = "http://thredds.northwestknowledge.net:8080/thredds/dodsC/agg_macav2metdata_"+vari1+"_"+modi+"_"+runi+"_historical_1950_2005_CONUS_monthly.nc" 
 diri_p2 = "http://thredds.northwestknowledge.net:8080/thredds/dodsC/agg_macav2metdata_"+vari1+"_"+modi+"_"+runi+"_"+rcpi+"_2006_2099_CONUS_monthly.nc" 
@@ -72,7 +72,7 @@ print(diri_v2)
 ;----------------
 ;----------------
 ;----------------
-; pr
+; precipitation file access
 
 f_p1 = addfile(diri_p1,"r")
 x_p1 = f_p1->precipitation(:,{latS:latN},{lonW:lonE})
@@ -99,8 +99,7 @@ dims = dimsizes(x_p(:,0,0))
 print(dims)
 
 ;----------------
-; sp. avg.
-
+; spatial averaging
 ; calc NDJFM total
 
 x_p_seas = x_p(14:dims-1:12,:,:)
@@ -120,8 +119,8 @@ x_ps = dim_stddev_n_Wrap(x_p_seas(0:54,:,:),0) ; sd
 printVarSummary(x_ps)
 printMinMax(x_ps,1)
 
-
 ;----------------
+; standardizing
 
 dims2 = dimsizes(x_p_seas(:,0,0))
 print(dims2)
@@ -150,7 +149,7 @@ printVarSummary(e1)
 ;----------------
 ;----------------
 ;----------------
-; vpd
+; vapor pressure deficit file access
 
 
 f_v1 = addfile(diri_v1,"r")
@@ -173,7 +172,7 @@ x_v= array_append_record (x_v1, x_v2, 0)
 printVarSummary(x_v)
 printMinMax(x_v,True)
 
-; calc sum of mean ASO (previous year) and mean MJJ (current year)
+; calc sum of mean ASO (Aug-Oct previous year) and mean MJJ (May-Jul current year)
 
 x_v_aso = month_to_season(x_v(0:dims-13,:,:), "ASO")
 
@@ -198,7 +197,7 @@ printVarSummary(x_vs)
 printMinMax(x_vs,1)
 
 ;----------------
-
+; standardizing
 
 e2 = x_v_seas
 
@@ -217,7 +216,8 @@ printVarSummary(e2)
 ;----------------
 ;----------------
 ;----------------
-;fdsi
+;fdsi calculation based on Williams et al (2013)
+; Park Williams, A., Allen, C.D., Macalady, A.K., Griffin, D., Woodhouse, C.A., Meko, D.M., Swetnam, T.W., Rauscher, S.A., Seager, R., Grissino-Mayer, H.D. and Dean, J.S., 2013. Temperature as a potent driver of regional forest drought stress and tree mortality. NatCC, 3(3), pp.292-297.
 
 fdsi = e1
 fdsi = (0.44*e1)-(0.56*e2)
@@ -258,6 +258,7 @@ print(nyrs+"    "+fdsi_avg)
  fname = "FDSI_timeseries_"+regi+"_"+timi+"_"+modi+"_"+runi+"_"+rcpi+"_"+datai+".txt"
  write_table(fname, "w", hlist, "%s")
  write_table(fname, "a", alist, "%d%16.2f%s%d%ld")
+
 ;----------------
 ;plot output FDSI timeseries data
 
