@@ -1,4 +1,4 @@
-; calculate spatial FDSI timeseries from gridded data  
+; calculate spatial FDSI timeseries from  a gridded downscaled climate projections data - MACAv2-metdata
 
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"   
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"   
@@ -9,6 +9,7 @@ begin
 
 ;----------------
 ; ENTER MODEL INFO (INPUT REQUIRED)
+; Climate model information could be accessed at: https://climate.northwestknowledge.net/MACA/GCMs.php 
 
 modi = "BNU-ESM" 
 rcpi = "rcp45" 
@@ -25,6 +26,12 @@ lonE_ti = 109.2 ; eastern-most longitude
 lonW = 360-lonW_ti
 lonE = 360-lonE_ti
 
+; NO INPUT REQUIRED BEYOND THIS
+;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 ;----------------
 
 varo = "fdsi"
@@ -39,7 +46,7 @@ vari2 = "vpd"
 
 outfile = "FDSI_timeseries_"+regi+"_"+timi+"_"+modi+"_"+runi+"_"+rcpi+"_"+datai
 
-;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 
 ; Get output selector from command line.
 
