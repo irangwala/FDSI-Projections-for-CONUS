@@ -1,0 +1,330 @@
+; calculate spatial FDSI timeseries from gridded data  
+
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"   
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"   
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"   
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
+
+begin
+
+;----------------
+; ENTER MODEL INFO (INPUT REQUIRED)
+
+modi = "BNU-ESM" 
+rcpi = "rcp45" 
+runi = "r1i1p1" 
+
+;----------------
+; ENTER LOCATION INFO (INPUT REQUIRED)
+
+regi = "DINO" ; region's name
+latS = 40.5		 
+latN = 40.5
+lonW_ti = 109.2 ; western-most longitude
+lonE_ti = 109.2 ; eastern-most longitude
+lonW = 360-lonW_ti
+lonE = 360-lonE_ti
+
+;----------------
+
+varo = "fdsi"
+varo_ti = "FDSI"
+timi = "1951-2099"
+datai = "MACAv2-metdata"
+vari1 = "pr"
+vari2 = "vpd"
+
+;----------------
+; Plotting Routine
+
+outfile = "FDSI_timeseries_"+regi+"_"+timi+"_"+modi+"_"+runi+"_"+rcpi+"_"+datai
+
+;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+; Get output selector from command line.
+
+   formats = (/ "pdf", "eps", "png", "x11" /)  ; output selector table
+   output = formats(2)			     ; get first match in list
+
+; setting plotting resources
+
+wks = gsn_open_wks(output, outfile)
+
+
+;----------------
+; OPeNDAP access data 
+
+diri_p1 = "http://thredds.northwestknowledge.net:8080/thredds/dodsC/agg_macav2metdata_"+vari1+"_"+modi+"_"+runi+"_historical_1950_2005_CONUS_monthly.nc" 
+diri_p2 = "http://thredds.northwestknowledge.net:8080/thredds/dodsC/agg_macav2metdata_"+vari1+"_"+modi+"_"+runi+"_"+rcpi+"_2006_2099_CONUS_monthly.nc" 
+diri_v1 = "http://thredds.northwestknowledge.net:8080/thredds/dodsC/agg_macav2metdata_"+vari2+"_"+modi+"_"+runi+"_historical_1950_2005_CONUS_monthly.nc"
+diri_v2 = "http://thredds.northwestknowledge.net:8080/thredds/dodsC/agg_macav2metdata_"+vari2+"_"+modi+"_"+runi+"_"+rcpi+"_2006_2099_CONUS_monthly.nc"
+
+print(diri_p1)
+print(diri_v2)
+
+;----------------
+;----------------
+;----------------
+; pr
+
+f_p1 = addfile(diri_p1,"r")
+x_p1 = f_p1->precipitation(:,{latS:latN},{lonW:lonE})
+printVarSummary(x_p1)
+printMinMax(x_p1,True)
+
+lat = x_p1&lat
+lon = x_p1&lon
+printVarSummary(lon)
+
+;----------------
+
+f_p2 = addfile(diri_p2,"r")
+x_p2 = f_p2->precipitation(:,{latS:latN},{lonW:lonE})
+printVarSummary(x_p2)
+printMinMax(x_p2,True)
+
+x_p= array_append_record (x_p1, x_p2, 0)
+printVarSummary(x_p)
+printMinMax(x_p,True)
+
+
+dims = dimsizes(x_p(:,0,0))
+print(dims)
+
+;----------------
+; sp. avg.
+
+; calc NDJFM total
+
+x_p_seas = x_p(14:dims-1:12,:,:)
+x_p_seas = (x_p(10:dims-13:12,:,:)+x_p(11:dims-13:12,:,:)+x_p(12:dims-1:12,:,:)+x_p(13:dims-1:12,:,:)+x_p(14:dims-1:12,:,:))
+printVarSummary(x_p_seas)
+printMinMax(x_p_seas,1)
+
+
+;----------------
+; calc historical (1950-2005) mean and std. dev.
+
+x_pm = dim_avg_n_Wrap(x_p_seas(0:54,:,:),0) ; mean
+printVarSummary(x_pm)
+printMinMax(x_pm,1)
+
+x_ps = dim_stddev_n_Wrap(x_p_seas(0:54,:,:),0) ; sd
+printVarSummary(x_ps)
+printMinMax(x_ps,1)
+
+
+;----------------
+
+dims2 = dimsizes(x_p_seas(:,0,0))
+print(dims2)
+
+x_p_seas_ln = x_p_seas
+x_p_seas_ln = log(x_p_seas)
+printVarSummary(x_p_seas_ln)
+
+x_pm_ln = x_pm
+x_pm_ln = log(x_pm)
+printVarSummary(x_pm_ln)
+
+x_ps_ln = x_ps
+x_ps_ln = log(x_ps)
+printVarSummary(x_ps_ln)
+
+e1 = x_p_seas_ln
+
+ do i = 0,dims2-1
+e1(i,:,:) = (x_p_seas_ln(i,:,:)-x_pm_ln)/x_ps_ln
+ end do
+
+printVarSummary(e1)
+
+
+;----------------
+;----------------
+;----------------
+; vpd
+
+
+f_v1 = addfile(diri_v1,"r")
+x_v1 = f_v1->vpd(:,{latS:latN},{lonW:lonE})
+printVarSummary(x_v1)
+printMinMax(x_v1,True)
+
+lat = x_v1&lat
+lon = x_v1&lon
+printVarSummary(lon)
+
+;----------------
+
+f_v2 = addfile(diri_v2,"r")
+x_v2 = f_v2->vpd(:,{latS:latN},{lonW:lonE})
+printVarSummary(x_v2)
+printMinMax(x_v2,True)
+
+x_v= array_append_record (x_v1, x_v2, 0)
+printVarSummary(x_v)
+printMinMax(x_v,True)
+
+; calc sum of mean ASO (previous year) and mean MJJ (current year)
+
+x_v_aso = month_to_season(x_v(0:dims-13,:,:), "ASO")
+
+x_v_mjj = month_to_season(x_v(12:dims-1,:,:), "MJJ")
+
+x_v_seas = x_v_aso
+x_v_seas = (x_v_aso+x_v_mjj)/2
+
+printVarSummary(x_v_seas)
+printMinMax(x_v_seas,1)
+
+
+;----------------
+; calc historical (1950-2005) mean and std. dev.
+
+x_vm = dim_avg_n_Wrap(x_v_seas(0:54,:,:),0) ; mean
+printVarSummary(x_vm)
+printMinMax(x_vm,1)
+
+x_vs = dim_stddev_n_Wrap(x_v_seas(0:54,:,:),0) ; sd
+printVarSummary(x_vs)
+printMinMax(x_vs,1)
+
+;----------------
+
+
+e2 = x_v_seas
+
+   do i = 0,dims2-1
+do i = 0,dims2-1
+
+denom = where(x_vs.eq.0,1,x_vs)
+numer = where(x_vs.eq.0,0,x_v_seas(i,:,:)-x_vm) 
+e2(i,:,:) = numer/denom
+
+end do
+   end do
+
+printVarSummary(e2)
+
+;----------------
+;----------------
+;----------------
+;fdsi
+
+fdsi = e1
+fdsi = (0.44*e1)-(0.56*e2)
+
+fdsi@long_name = "Forest Drought Stress Index"
+fdsi@units = "standarized index"
+printVarSummary(fdsi)
+
+;----------------
+;----------------
+;----------------
+;----------------
+; print output FDSI timeseries data
+
+nyrs = ispan(1951,2099,1)
+printVarSummary(nyrs)
+
+fdsi_avg = dim_avg_n_Wrap(dim_avg_n_Wrap(fdsi,2),1)
+printVarSummary(fdsi_avg)
+printMinMax(fdsi_avg,True)
+
+print("Model = "+modi)
+print("Year    FDSI")
+print(nyrs+"    "+fdsi_avg)
+
+
+;----------------
+; write table
+
+ header = (/"Source: North Central Climate Adaptation Science Center", \
+	    "--------------------------------", \
+            "Year             FDSI", \
+            "--------------------------------"/)
+
+ alist = [/nyrs, fdsi_avg/]
+ hlist = [/header/]
+
+ fname = "FDSI_timeseries_"+regi+"_"+timi+"_"+modi+"_"+runi+"_"+rcpi+"_"+datai+".txt"
+ write_table(fname, "w", hlist, "%s")
+ write_table(fname, "a", alist, "%d%16.2f%s%d%ld")
+;----------------
+;plot output FDSI timeseries data
+
+ res   = True
+ res@gsnScale = True               
+
+; these four resources allow the user to stretch the plot size, and
+; decide exactly where on the page to draw it.
+
+ res@vpXF      = 0.10        ; In page coordinates, where to start
+ res@vpYF      = 0.80       ; the plot
+ res@vpHeightF = 0.50        ; Changes the aspect ratio
+ res@vpWidthF  = 0.85
+
+  res@gsnMaximize = True
+
+  res@gsnFrame              = False
+  res@gsnDraw               = False
+
+ res@trYMinF   = -4.5        ; min value on y-axis
+ res@trYMaxF   =  4.5        ; max value on y-axis
+ res@trXMinF               = 1950
+ res@trXMaxF               = 2100
+ 
+  res@tmYLMode = "Manual"	
+  res@tmYLTickStartF  = -5
+  res@tmYLTickEndF    = 5
+  res@tmYLTickSpacingF= 1 
+  res@tmYLMaxTicks = 15
+
+ res@tmXTOn = False
+ res@tmYROn = False
+ res@tmXBMinorOn = False
+ res@tmYLMinorOn = False
+ res@tiYAxisString = ""
+
+
+  res@tmXBMode        = "Manual"	
+  res@tmXBTickStartF  = 1950
+  res@tmXBTickEndF    = 2100
+  res@tmXBTickSpacingF= 20 
+
+  res@tiMainString = varo_ti+": "+regi+" ("+latS+"-"+latN+"N, "+lonE_ti+"-"+lonW_ti+"W)  ~C~ ~Z75~      "+modi+"_"+runi+"_"+rcpi+"_"+datai  ;plot title 
+  res@tiMainFontHeightF = 0.025
+
+  res@gsnYRefLine           = 0              ; reference line   
+  
+  res@gsnXYBarChart         = True            ; create bar chart 
+  res@gsnAboveYRefLineColor = "slateblue4"           ; above ref line fill red
+  res@gsnBelowYRefLineColor = "orangered3"          ; below ref line fill blue
+
+
+plot = gsn_csm_xy (wks,nyrs,fdsi_avg,res)
+
+draw(plot)
+
+;--------------------
+; legend
+
+  txres               = True
+  ;txres@txFont = 22
+  txres@txFontHeightF = 0.010
+   
+  xtxt = (/0.88,0.8/)   ; text
+  ytxt = (/0.16,0.14/)   ; strings.
+
+  text1 = "FDSI data and plot generated by:"
+  text2 = "North Central Climate Adaptation Science Center (NC CASC)"
+
+gsn_text_ndc(wks,text1,xtxt(0),ytxt(0),txres)
+gsn_text_ndc(wks,text2,xtxt(1),ytxt(1),txres)
+
+;--------------------
+
+frame(wks)
+
+end
