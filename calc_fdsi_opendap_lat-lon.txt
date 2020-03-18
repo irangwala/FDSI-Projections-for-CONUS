@@ -46,8 +46,6 @@ vari2 = "vpd"
 
 outfile = "FDSI_timeseries_"+regi+"_"+timi+"_"+modi+"_"+runi+"_"+rcpi+"_"+datai
 
-
-
 ; Get output selector from command line.
 
    formats = (/ "pdf", "eps", "png", "x11" /)  ; output selector table
