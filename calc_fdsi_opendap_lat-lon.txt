@@ -19,11 +19,11 @@ runi = "r1i1p1"    ; enter model experiment ID (this is r1i1p1 for all GCMs exce
 ;----------------
 ; ENTER LOCATION INFO (INPUT REQUIRED)
 
-regi = "DINO"      ; enter region's name
-latS = 40.5        ; enter southern-most latitude value	in degrees north
+regi = "Rocky Mountain National Park"      ; enter region's name
+latS = 39.9        ; enter southern-most latitude value	in degrees north
 latN = 40.5        ; enter northern-most latitude value	in degrees north
-lonW_ti = 109.2    ; enter  western-most longitude value in degrees west
-lonE_ti = 109.2    ; enter eastern-most longitude value	in degrees west
+lonW_ti = 105.8    ; enter  western-most longitude value in degrees west
+lonE_ti = 105.5    ; enter eastern-most longitude value	in degrees west
 lonW = 360-lonW_ti
 lonE = 360-lonE_ti
 
