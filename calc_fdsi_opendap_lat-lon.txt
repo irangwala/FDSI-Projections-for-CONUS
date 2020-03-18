@@ -1,4 +1,5 @@
 ; calculate spatial FDSI timeseries from  a gridded downscaled climate projections data - MACAv2-metdata
+; FDSI calculations are based on Williams et al. 2013. Temperature as a potent driver of regional forest drought stress and tree mortality. NatCC, 3(3), pp.292-297. https://www.nature.com/articles/nclimate1693 
 
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"   
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"   
@@ -11,28 +12,27 @@ begin
 ; ENTER MODEL INFO (INPUT REQUIRED)
 ; Climate model information could be accessed at: https://climate.northwestknowledge.net/MACA/GCMs.php 
 
-modi = "BNU-ESM" 
-rcpi = "rcp45" 
-runi = "r1i1p1" 
+modi = "BNU-ESM"   ; enter GCM name
+rcpi = "rcp45"     ; enter RCP (option include rcp45 or rcp85)
+runi = "r1i1p1"    ; enter model experiment ID (this is r1i1p1 for all GCMs except CCSM4 for which it is r6i1p1)
 
 ;----------------
 ; ENTER LOCATION INFO (INPUT REQUIRED)
 
-regi = "DINO" ; region's name
-latS = 40.5		 
-latN = 40.5
-lonW_ti = 109.2 ; western-most longitude
-lonE_ti = 109.2 ; eastern-most longitude
+regi = "DINO"      ; enter region's name
+latS = 40.5        ; enter southern-most latitude value	 
+latN = 40.5        ; enter northern-most latitude value
+lonW_ti = 109.2    ; enter  western-most longitude
+lonE_ti = 109.2    ; enter eastern-most longitude
 lonW = 360-lonW_ti
 lonE = 360-lonE_ti
 
+;----------------
 ; NO INPUT REQUIRED BEYOND THIS
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-;----------------
 
 varo = "fdsi"
 varo_ti = "FDSI"
@@ -216,8 +216,8 @@ printVarSummary(e2)
 ;----------------
 ;----------------
 ;----------------
-;fdsi calculation based on Williams et al (2013)
-; Park Williams, A., Allen, C.D., Macalady, A.K., Griffin, D., Woodhouse, C.A., Meko, D.M., Swetnam, T.W., Rauscher, S.A., Seager, R., Grissino-Mayer, H.D. and Dean, J.S., 2013. Temperature as a potent driver of regional forest drought stress and tree mortality. NatCC, 3(3), pp.292-297.
+
+;fdsi estimation
 
 fdsi = e1
 fdsi = (0.44*e1)-(0.56*e2)
