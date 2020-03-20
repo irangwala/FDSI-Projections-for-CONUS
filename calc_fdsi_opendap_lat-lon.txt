@@ -13,8 +13,8 @@ begin
 ; Climate model information could be accessed at: https://climate.northwestknowledge.net/MACA/GCMs.php 
 
 modi = "BNU-ESM"   ; enter GCM name
-rcpi = "rcp45"     ; enter RCP (option include rcp45 or rcp85)
-runi = "r1i1p1"    ; enter model experiment ID (this is r1i1p1 for all GCMs except CCSM4 for which it is r6i1p1)
+rcpi = "rcp45"     ; enter RCP (options include rcp45 or rcp85)
+runi = "r1i1p1"    ; enter model experiment ID (r1i1p1 for all GCMs except CCSM4 for which it is r6i1p1)
 
 ;----------------
 ; ENTER LOCATION INFO (INPUT REQUIRED)
