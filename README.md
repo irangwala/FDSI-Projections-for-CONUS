@@ -5,7 +5,7 @@ Acknowledgement: This work is supported by the North Central Climate Adaptation 
 
 Reference: Park Williams, A., Allen, C., Macalady, A. et al. Temperature as a potent driver of regional forest drought stress and tree mortality. Nature Clim Change 3, 292–297 (2013). https://doi.org/10.1038/nclimate1693
 
-Historical Gridded Datasets for FDSI in netCDF:
+Historical CONUS-wide Gridded Datasets for FDSI in netCDF:
 1. GRIDMET-based FDSI (1980-2018): This calculation uses monthly precipitation and VPD from GRIDMET as drivers; Data Access: https://tinyurl.com/4zn89ms7
 2. nClimGrid-based FDSI (1986-2017): This calculation uses monthly precipitation and mean temperature (not VPD) from nClimGrid as drivers; Data Access: https://tinyurl.com/1d7dmrlk
 
