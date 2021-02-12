@@ -7,5 +7,5 @@ Reference: Park Williams, A., Allen, C., Macalady, A. et al. Temperature as a po
 
 Historical CONUS-wide Gridded Datasets for FDSI in netCDF:
 1. GRIDMET-based FDSI (1980-2018): This calculation uses monthly precipitation and VPD from GRIDMET as drivers; Data Access: https://tinyurl.com/4zn89ms7
-2. nClimGrid-based FDSI (1986-2017): This calculation uses monthly precipitation and mean temperature (not VPD) from nClimGrid as drivers; Data Access: https://tinyurl.com/1d7dmrlk
+2. nClimGrid-based FDSI (1896-2017): This calculation uses monthly precipitation and mean temperature (not VPD) from nClimGrid as drivers; Data Access: https://tinyurl.com/1d7dmrlk
 
